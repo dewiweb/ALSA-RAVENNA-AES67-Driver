@@ -1,1 +1,204 @@
+<!DOCTYPE html>
+<html dir="ltr">  
+    <head>
+        <title></title>
+        
+        <meta name="viewport" content="width=700, user-scalable=no" />
+        
+        <META Http-Equiv="Cache-Control" Content="no-cache">
+        <META Http-Equiv="Pragma" Content="no-cache">
+        <META Http-Equiv="Expires" Content="0"> 
+        
+        <script type="text/javascript" src="ravenna/widget/Common.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="rickshaw/src/css/graph.css">
+        <link rel="stylesheet" type="text/css" href="rickshaw/src/css/detail.css">
+        <link rel="stylesheet" type="text/css" href="rickshaw/src/css/legend.css">
+        <!--<link rel="stylesheet" type="text/css" href="rickshaw/rickshaw.min.css">-->
+        <!--<link rel="stylesheet" type="text/css" href="rickshaw/css/extensions.css">-->
+        <script type="text/javascript" src="rickshaw/vendor/d3.min.js"></script>
+        <!--<script type="text/javascript" src="rickshaw/rickshaw.min.js"></script>-->
+        <script type="text/javascript" src="rickshaw/rickshaw.js"></script>
+
+
+
+        <script type="text/javascript" src="dojo/dojo.js" djConfig="parseOnLoad: true, isDebug: false, locale: 'en'"></script>
+       <!-- <script>dojo.require(["dojo/parser", "dijit/form/Button"]);</script>
+           -->
+        <script>dojo.require("ravenna.Device")</script>
+        
+        <link rel="shortcut icon" type="image/x-icon" href="./images/favicon.ico" />
+        
+        <link rel="stylesheet" type="text/css" href="./ravenna/ravenna.css" />
+        <link rel="stylesheet" type="text/css" href="./ravenna/Device.css" />
+        <style type="text/css">
+            body, html { font-family:helvetica,arial,sans-serif; font-size:95%; }
+            html, body { width: 100%; height: 100%; margin: 0; overflow:hidden; }
+            #main { width: 100%; height: 100%; }
+        </style>
+		
+		<script type="text/javascript">zman_product = false;</script>
+        <script type="text/javascript">embedded_product = false;</script>
+    </head>
+    
+    <body class="tundra">
+        <div dojoType="dojox.widget.Toaster" id="toast" positionDirection="br-up" duration="0" messageTopic = "ravennaTopic"></div>
+        <div id="errorDialog" dojoType="dijit.Dialog" title="Error">
+            <div dojoType="dijit.layout.ContentPane" style="color: red">
+                No connection to device.
+            </div>    
+        </div>
+        <div id="main" dojoType="dijit.layout.BorderContainer" gutters="true" style="min-width: 800px;">
+            <div dojoType="dijit.layout.BorderContainer" region="top" style="background-color: #fff; height: 100px;" gutters="false">    <!---->
+                <img style="padding: 5px;" region="left" src="./images/ravenna_AES67.png" alt="Loading..."></img>
+                <div dojoType="dijit.layout.ContentPane"  region="right" style="width: 100%;">
+                    <img style="float: right; height: 100px; padding-right: 5px;" src="./images/vendor.png" alt="Loading..."></img>
+                    <div dojoType="ravenna.widget.Identity" store="ravenna.Device.store"></div>
+                </div>
+            </div>
+            <div id="tabs" dojoType="dijit.layout.TabContainer" region="center" tabStrip="true">         
+                   
+                <div dojoType="dijit.layout.ContentPane" title="General settings" selected="true">
+                    <h1>Audio configuration</h1>
+                    <div dojoType="ravenna.widget.AudioConfiguration" store="ravenna.Device.store"></div>
+                    <h1>Device Name</h1>
+                    <div dojoType="ravenna.widget.DeviceName" store="ravenna.Device.store"></div>     
+                    <h1>Network Interface</h1>
+                    <div dojoType="ravenna.widget.IPSettings" store="ravenna.Device.store"></div>                                   
+                </div>
+<!--
+				<div dojoType="dijit.layout.ContentPane" title="PTP">
+                    <div id="PTP" dojoType="ravenna.widget.PTP" store="ravenna.Device.store"></div>                                        
+                </div>
+
+                <div dojoType="dijit.layout.ContentPane" title="Session sources">
+                    <div id="sessionSources" dojoType="ravenna.widget.SessionSources" store="ravenna.Device.store" cols="1" showLabels="false"></div>
+                </div>
+    
+                <div dojoType="dijit.layout.ContentPane" title="Session sinks">
+                    <div id="sessionSinks" dojoType="ravenna.widget.SessionSinks" store="ravenna.Device.store" cols="1" showLabels="false"></div>
+                </div>
+
+                <div dojoType="dijit.layout.ContentPane" title="Ins/Outs" preload="true">
+                    <div dojoType="ravenna.widget.IOs" store="ravenna.Device.store"></div>
+                </div>
+    
+                <div id="contentPane_IORouter" dojoType="dijit.layout.ContentPane" title="I/O Router" preload="true">
+                    <div dojoType="ravenna.widget.IORouter" store="ravenna.Device.store"></div>
+                </div>
+
+                <div id="contentPane_Statistics" dojoType="dijit.layout.ContentPane" title="Statistics" preload="true">
+                    <div dojoType="ravenna.widget.Statistics" store="ravenna.Device.store"></div>
+                </div>
+                -->
+                <div dojotype="dijit.layout.ContentPane" title="Debug" selected="true">					
+					<h1>Build Number</h1>
+						<div id="rv-buildnr"></div>
+						
+                    <h1>Commands</h1>
+					<button data-dojo-type="dijit.form.Button" type="button">
+                        Reboot
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">							
+                            require(["dojo/dom"], function(dom){
+								ravenna.Device.reboot();                              
+                            });
+                        </script>
+                    </button>
+					<br/>
+                    <button data-dojo-type="dijit.form.Button" type="button">
+                        Reboot to Factory
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+                            require(["dojo/dom"], function(dom){
+                            ravenna.Device.reset_to_factory();
+                            });
+                        </script>
+                    </button>
+                    <br />
+					<button data-dojo-type="dijit.form.Button" type="button">
+                        Save
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">							
+                            require(["dojo/dom"], function(dom){
+								ravenna.Device.save();
+                            });
+                        </script>
+                    </button>
+					<br/>
+					
+					<h1>Debug</h1>
+                    <button data-dojo-type="dijit.form.Button" type="button">
+                        Get Report
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+                            require(["dojo/dom"], function(dom){
+                                window.open('/commands/get_report', 'Download');
+                            });
+                        </script>
+                    </button>
+					<br/>
+					<button data-dojo-type="dijit.form.Button" type="button">
+                        Get Device Status
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+                            require(["dojo/dom"], function(dom){
+                                window.open('/commands/get_device_status', 'Download');
+                            });
+                        </script>
+                    </button>
+                    <button data-dojo-type="dijit.form.Button" type="button">
+                        Get Device Engine Status
+                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+                            require(["dojo/dom"], function(dom){
+                            window.open('/commands/get_device_engine_status', 'Download');
+                            });
+                        </script>
+                    </button>
+					<br/>									
+                </div>
+
+<!--
+                <div dojoType="dijit.layout.ContentPane" title="Network">
+                    <h1>Device Name</h1>
+                    <div dojoType="ravenna.widget.DeviceName" store="ravenna.Device.store"></div>
+                    
+                    <h1>Host Name</h1>
+                    <div dojoType="ravenna.widget.HostName" store="ravenna.Device.store"></div>
+                    
+                    <h1>Network Interface</h1>
+                    <div dojoType="ravenna.widget.IPSettings" store="ravenna.Device.store"></div>
+                    
+                    <h1>Clock</h1>
+                    <div dojoType="ravenna.widget.ClockDomain" store="ravenna.Device.store"></div>
+                    
+                    <h1>Streaming QoS</h1>
+                    <div dojoType="ravenna.widget.QoSSettings" store="ravenna.Device.store" identifier="'$.network.qos'"></div>
+                </div>
+                -->
+                <!--
+                <div dojoType="dijit.layout.ContentPane" title="Tools">
+                    <h1>Build Number</h1>
+                    <div id="rv-buildnr"></div>
+                    <h1>Update Image</h1>
+                    <form action="./upload" method="post" enctype="multipart/form-data">
+                        <p>Select the image you want to flash the device with:
+                            <input name="Datei" type="file" size="50" maxlength="10000000" accept="*/*">
+                        </p>
+                        <input type="submit" value=" Start update ">
+                    </form>
+                    
+                    <h1>Reboot Device</h1>
+                    <button class="rvReboot" dojoType="dijit.form.Button" type="button">
+                        Reboot device
+                        <script type="dojo/method" event="onClick" args="evt">
+                            ravenna.Device.reboot();
+                        </script>
+                    </button>
+                    -->
+                </div>
+                <div id="merginglogo" gutters="true">
+                    <img src="./images/merging_logo.png" alt="Loading..." style="float:right;"></img>
+                </div>
+            </div>
+            <script> // for one reason or another this empty script tag fixes the chrome layout problem ...?
+            </script>
+        </div>
+    </body>
+</html>
 
