@@ -69,10 +69,14 @@
 	#if defined(MTAL_WIN)
         #if defined(MTAL_KERNEL)
             #include <Ntddk.h>
-            #ifdef DBG
+
+			extern void MTAL_EnableDbgPrint(bool m_Enable);
+			extern void MTAL_DbgPrint(PCSTR Format, ...);
+			#ifdef DBG
 				#define MTAL_DP	 DbgPrint
 			#else
-				#define MTAL_DP(...)
+				//#define MTAL_DP(...)
+				#define MTAL_DP	 MTAL_DbgPrint
 			#endif
         #else
 			#include <windows.h>

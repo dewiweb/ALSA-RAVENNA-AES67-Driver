@@ -185,13 +185,22 @@ void MTAL_LK_write_unlock_irqrestore(MTAL_LK_rwlock_ptr rwlock, unsigned long fl
 uint64_t MTAL_LK_GetCounterTime(void) // 100 ns precision
 {
     uint64_t timeVal = 0ull;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,19,0)
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,0,0)
+    struct timespec64 ts64;
+    ktime_get_real_ts64(&ts64);
+    
+// #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,18,0) // getrawmonotonic64 deprecated in mid-2018
+    // struct timespec64 ts64;
+    // ktime_get_raw_ts64(&ts64);
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(3,19,0)
     struct timespec64 ts64;
     getrawmonotonic64(&ts64);
 #else
     struct timespec ts64;
     getrawmonotonic(&ts64);
-#endif // LINUX_VERSION_CODE
+#endif  // LINUX_VERSION_CODE
+
     timeVal += (uint64_t)ts64.tv_sec * 10000000ull;
     timeVal += (uint64_t)ts64.tv_nsec / 100ull;
     return timeVal;

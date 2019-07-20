@@ -54,6 +54,8 @@ typedef int32_t(*MTAL_IPC_IOCTL_CALLBACK)(void* cb_user, uint32_t  ui32MsgId, vo
 	EMTAL_IPC_Error MTAL_IPC_init_WIN32(int8_t bHost, uint32_t ui32Prefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, uintptr_t* pptrHandle);
 #else
 	EMTAL_IPC_Error MTAL_IPC_init(uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, uintptr_t* pptrHandle);
+	EMTAL_IPC_Error MTAL_IPC_init_ex(uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, char const* pcThreadName, uintptr_t* pptrHandle);
+	EMTAL_IPC_Error MTAL_IPC_set_priority(uintptr_t ptrHandle, int policy, int priority);
 #endif
 EMTAL_IPC_Error MTAL_IPC_destroy(uintptr_t ptrHandle);
 // debug
@@ -61,6 +63,7 @@ EMTAL_IPC_Error MTAL_IPC_set_display_elapsedtime_threshold(uintptr_t ptrHandle, 
 
 // PTPv2d only
 #ifdef MTAL_IPC_PTPV2D
+	// Note: MTAL_IPC_init_PTPV2D will not create a thread; incomming pmessages are processed by calling MTAL_IPC_process_FIFO()
 	EMTAL_IPC_Error MTAL_IPC_init_PTPV2D(uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, uintptr_t* pptrHandle);
 	EMTAL_IPC_Error MTAL_IPC_get_FIFO_fd(uintptr_t ptrHandle, int * piFd);
 	EMTAL_IPC_Error MTAL_IPC_process_FIFO(uintptr_t ptrHandle, void* user, int * piRet);

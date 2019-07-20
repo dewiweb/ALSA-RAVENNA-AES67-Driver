@@ -78,8 +78,8 @@
 #define DEFAULT_AUDIOMODE               MergingRAVENNACommon::AM_PCM
 #define DEFAULT_AUDIODATAFORMAT         MergingRAVENNACommon::ADF_PCM
 #define DEFAULT_ZONE                    MergingRAVENNACommon::Z_8_HP
-#define DEFAULT_NUMBEROFINPUTS          8
-#define DEFAULT_NUMBEROFOUTPUTS         8
+#define DEFAULT_NUMBEROFINPUTS          64
+#define DEFAULT_NUMBEROFOUTPUTS         64
 #define DEFAULT_FOLLOWDOPDETECTION      true
 
 #ifdef DSD256_at_705k6

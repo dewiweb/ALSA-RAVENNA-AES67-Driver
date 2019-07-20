@@ -44,9 +44,6 @@
 
 #include "MTAL_EthUtils.h"
 
-//// Hack to support strang QSC port mapping
-//#define QSC_HACK 1
-
 #define MAX_STREAM_NAME_SIZE	64
 #define MAX_CODEC_NAME_SIZE		10
 #define MAX_CHANNELS_BY_RTP_STREAM 64

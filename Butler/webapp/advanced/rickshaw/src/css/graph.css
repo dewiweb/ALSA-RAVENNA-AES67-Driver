@@ -63,7 +63,6 @@
         position: absolute;
         top: 0;
         bottom: -6px;
-        z-index: -10;
 }
 .rickshaw_graph .annotation_range.active {
         display: block;
@@ -115,7 +114,7 @@
 .rickshaw_graph  .x_axis_d3 {
 	fill: none;
 }
-.rickshaw_graph .y_ticks .tick,
+.rickshaw_graph .y_ticks .tick line,
 .rickshaw_graph .x_ticks_d3 .tick {
 	stroke: #dddddd; /*rgba(0, 0, 0, 0.16);*/
 	stroke-width: 2px;
@@ -128,6 +127,9 @@
 	stroke: #dddddd; /*rgba(255, 0, 0, 0.20);*/
 	stroke-width: 1px;
 	stroke-dasharray: 1 1;
+}
+.rickshaw_graph .y_grid .tick[data-y-value="0"] {
+	stroke-dasharray: 1 0;
 }
 .rickshaw_graph .y_grid path,
 .rickshaw_graph .x_grid_d3 path  {

@@ -235,6 +235,7 @@ int get_max_interrupts_frame_size(void* user, uint32_t *framesize);
 int get_interrupts_frame_size(void* user, uint32_t *framesize); // ALSA PCM period size must be a multiple of this framesize
 int set_sample_rate(void* user, uint32_t rate);
 int get_sample_rate(void* user, uint32_t *rate);
+int get_jitter_buffer_sample_bytelength(void* user, char *byte_len);
 //int set_nb_inputs(void* user, uint32_t nb_channels);
 //int set_nb_outputs(void* user, uint32_t nb_channels);
 int get_nb_inputs(void* user, uint32_t *nb_Channels);

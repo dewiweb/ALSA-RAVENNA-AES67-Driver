@@ -53,11 +53,6 @@ int check_struct_version(TRTP_stream_info* rtp_stream_info)
 ////////////////////////////////////////////////////////////////////
 uint64_t get_key(TRTP_stream_info* rtp_stream_info)
 {
-#ifdef QSC_HACK
-	if(rtp_stream_info->m_usDestPort == 6517 /*QSC*/)
-		return ((uint64_t)MTAL_SWAP32(rtp_stream_info->m_ui32DestIP)) << 32 | MTAL_SWAP16(rtp_stream_info->m_usDestPort) << 16 | MTAL_SWAP16(rtp_stream_info->m_usSrcPort);
-	else
-#endif
 	return ((uint64_t)MTAL_SWAP32(rtp_stream_info->m_ui32DestIP)) << 16 | MTAL_SWAP16(rtp_stream_info->m_usDestPort);
 }
 

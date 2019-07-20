@@ -139,7 +139,7 @@
     #define rv_log(log_level, ...)  \
     {\
         int log_level_tmp = log_level > 7 ? 7 : log_level;\
-        if(log_level <= LOG_MAX_LEVEL)\
+        if(log_level_tmp <= LOG_MAX_LEVEL)\
         {\
             char cBuffer[512]; \
             snprintf(cBuffer, 512, "In %s, line %i: ", __FILE_NAME__, __LINE__);\
@@ -155,7 +155,7 @@
     #define log4c_log(device_category, log_level, ...)\
     {\
         int log_level_tmp = log_level > 7 ? 7 : log_level;\
-        if(log_level <= LOG_MAX_LEVEL) {\
+        if(log_level_tmp <= LOG_ERR) {\
             char cBuffer[512];\
             snprintf(cBuffer, 512, "[%s] In %s, line %i: ", TOSTRING(device_category), __FILE_NAME__, __LINE__);\
             snprintf(cBuffer + strlen(cBuffer), 512 - strlen(cBuffer), __VA_ARGS__);\

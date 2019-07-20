@@ -1569,6 +1569,18 @@ int get_sample_rate(void* user, uint32_t *rate)
     return -EINVAL;
 }
 
+int get_jitter_buffer_sample_bytelength(void* user, char *byte_len)
+{
+    struct TManager* self = (struct TManager*)user;
+    if(byte_len)
+    {
+        int err = 0;
+        *byte_len = get_audio_engine_sample_bytelength(self);
+        return err;
+    }
+    return -EINVAL;
+}
+
 int get_nb_inputs(void* user, uint32_t *nb_Channels)
 {
     struct TManager* self = (struct TManager*)user;
@@ -1828,6 +1840,7 @@ void init_alsa_callbacks(struct TManager* self)
     self->m_alsa_callbacks.get_interrupts_frame_size = &get_interrupts_frame_size;
     self->m_alsa_callbacks.set_sample_rate = &set_sample_rate;
     self->m_alsa_callbacks.get_sample_rate = &get_sample_rate;
+    self->m_alsa_callbacks.get_jitter_buffer_sample_bytelength = &get_jitter_buffer_sample_bytelength;
     //self->m_alsa_callbacks.set_nb_inputs = &set_nb_inputs;
     //self->m_alsa_callbacks.set_nb_outputs = &set_nb_outputs;
     self->m_alsa_callbacks.get_nb_inputs = &get_nb_inputs;

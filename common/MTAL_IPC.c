@@ -17,9 +17,10 @@
 
 
 	#include <errno.h>
-	
+
 	#include <pthread.h>
 #endif
+
 
 #include "rv_log.h"
 #include "MTAL_IPC.h"
@@ -93,6 +94,7 @@ typedef struct
 
 	uint32_t s_ui32MsgSeqId;
 
+	char const* s_pcThreadName;
 	pthread_t s_pthread;
 	pthread_mutex_t s_lock;
 
@@ -102,8 +104,9 @@ typedef struct
 } TMTAL_IPC_Instance;
 
 
-static EMTAL_IPC_Error private_init(int bPTPMode, uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, uintptr_t* pptrHandle);
+static EMTAL_IPC_Error private_init(int bPTPMode, uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, char const* pcThreadName, uintptr_t* pptrHandle);
 static int create_thread(TMTAL_IPC_Instance* pTMTAL_IPC_Instance);
+static int set_thread_priority(TMTAL_IPC_Instance* pTMTAL_IPC_Instance, int policy, int priority);
 static void destroy_thread(TMTAL_IPC_Instance* pTMTAL_IPC_Instance);
 static void* thread_proc(void *pParam);
 
@@ -173,19 +176,26 @@ static int IsMsgBlockValid(MTAL_IPC_MsgBlockBase* pMTAL_IPC_MsgBlockBase)
 ////////////////////////////////////////////////////////////////
 EMTAL_IPC_Error MTAL_IPC_init(uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, uintptr_t* pptrHandle)
 {
-	return private_init(0, ui32LocalServerPrefix, ui32PeerServerPrefix, cb, cb_user, pptrHandle);
+	return MTAL_IPC_init_ex(ui32LocalServerPrefix, ui32PeerServerPrefix, cb, cb_user, NULL, pptrHandle);
+	
+}
+
+//////////////////////////////////////////////////////////////////
+EMTAL_IPC_Error MTAL_IPC_init_ex(uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, char const* pcThreadName, uintptr_t* pptrHandle)
+{
+	return private_init(0, ui32LocalServerPrefix, ui32PeerServerPrefix, cb, cb_user, pcThreadName, pptrHandle);
 }
 
 #ifdef MTAL_IPC_PTPV2D
 //////////////////////////////////////////////////////////////////
 EMTAL_IPC_Error MTAL_IPC_init_PTPV2D(uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, uintptr_t* pptrHandle)
 {
-	return private_init(1, ui32LocalServerPrefix, ui32PeerServerPrefix, cb, cb_user, pptrHandle);
+	return private_init(1, ui32LocalServerPrefix, ui32PeerServerPrefix, cb, cb_user, NULL, pptrHandle);
 }
 #endif
 
 //////////////////////////////////////////////////////////////////
-EMTAL_IPC_Error private_init(int bPTPv2dMode, uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, uintptr_t* pptrHandle)
+EMTAL_IPC_Error private_init(int bPTPv2dMode, uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, char const* pcThreadName, uintptr_t* pptrHandle)
 {
 	// static init
 	{
@@ -231,6 +241,8 @@ EMTAL_IPC_Error private_init(int bPTPv2dMode, uint32_t ui32LocalServerPrefix, ui
 	pTMTAL_IPC_Instance->s_bPTPv2d = bPTPv2dMode;
 	pTMTAL_IPC_Instance->s_callback = cb;
 	pTMTAL_IPC_Instance->s_callback_user = cb_user;
+
+	pTMTAL_IPC_Instance->s_pcThreadName = pcThreadName;
 	
 	char szFIFO_Name[256];
 	
@@ -368,7 +380,18 @@ EMTAL_IPC_Error private_init(int bPTPv2dMode, uint32_t ui32LocalServerPrefix, ui
 	return MIE_SUCCESS;
 }
 
+////////////////////////////////////////////////////////////////
+EMTAL_IPC_Error MTAL_IPC_set_priority(uintptr_t ptrHandle, int policy, int priority)
+{
+	if (!ptrHandle)
+	{
+		// message
+		return MIE_HANDLE_INVALID;
+	}
 
+	TMTAL_IPC_Instance* pTMTAL_IPC_Instance = (TMTAL_IPC_Instance*)ptrHandle;
+	return set_thread_priority(pTMTAL_IPC_Instance, policy, priority) == 0 ? MIE_SUCCESS : MIE_FAIL;
+}
 
 ////////////////////////////////////////////////////////////////
 EMTAL_IPC_Error MTAL_IPC_destroy(uintptr_t ptrHandle)
@@ -522,7 +545,7 @@ EMTAL_IPC_Error MTAL_IPC_SendIOCTL(uintptr_t ptrHandle, uint32_t ui32MsgId, void
 	if (pTMTAL_IPC_Instance->ui32DisplayElapsedTimeThreshold != (unsigned)~0 && get_elapse_time(ui32StartTime) > pTMTAL_IPC_Instance->ui32DisplayElapsedTimeThreshold)
 	{
 		char display[256];
-		sprintf(display, "[%i]MTAL_IPC_SendIOCTL", pTMTAL_IPC_Instance->ui32LocalServerPrefix);
+		sprintf(display, "[%i]MTAL_IPC_SendIOCTL(%u)", pTMTAL_IPC_Instance->ui32LocalServerPrefix, ui32MsgId);
 		display_elapse_time(display, ui32StartTime);
 	}
 
@@ -857,6 +880,21 @@ static int create_thread(TMTAL_IPC_Instance* pTMTAL_IPC_Instance)
 }
 
 ////////////////////////////////////////////////////////////////
+static int set_thread_priority(TMTAL_IPC_Instance* pTMTAL_IPC_Instance, int policy, int priority)
+{
+	struct sched_param param;
+	int		policyTmp;
+
+	pthread_getschedparam(pTMTAL_IPC_Instance->s_pthread, &policyTmp, &param);
+	//rv_log(LOG_INFO, "Thread: %d has policy = %i and sched_priority %d\n", tid, policyTmp, param.sched_priority);
+
+	// scheduling parameters of target thread		
+	param.sched_priority = priority;
+	rv_log(LOG_DEBUG, "Thread(%u) set policy to %i and sched_priority to %d\n", pTMTAL_IPC_Instance->s_pthread, policy, param.sched_priority);
+	return pthread_setschedparam(pTMTAL_IPC_Instance->s_pthread, policy, &param);
+}
+
+////////////////////////////////////////////////////////////////
 static void destroy_thread(TMTAL_IPC_Instance* pTMTAL_IPC_Instance)
 {
 	if (pTMTAL_IPC_Instance->s_pthread)
@@ -877,6 +915,16 @@ static void destroy_thread(TMTAL_IPC_Instance* pTMTAL_IPC_Instance)
 static void* thread_proc(void *pParam)
 {
 	TMTAL_IPC_Instance* pTMTAL_IPC_Instance = (TMTAL_IPC_Instance*)pParam;
+
+
+	// set name for debugging purpose
+	if(pTMTAL_IPC_Instance->s_pcThreadName)
+	{
+
+		pthread_setname_np(pTMTAL_IPC_Instance->s_pthread, pTMTAL_IPC_Instance->s_pcThreadName);
+	}
+
+	
 
 	rv_log(LOG_DEBUG, "thread start...\n");
 	
@@ -929,6 +977,12 @@ static void display_elapse_time(char* pcText, uint32_t ui32StartTime) // [us]
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 EMTAL_IPC_Error MTAL_IPC_init(uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, uintptr_t* pptrHandle)
+{
+	return MIE_SUCCESS;
+}
+
+////////////////////////////////////////////////////////////////
+EMTAL_IPC_Error MTAL_IPC_init_ex(uint32_t ui32LocalServerPrefix, uint32_t ui32PeerServerPrefix, MTAL_IPC_IOCTL_CALLBACK cb, void* cb_user, char const* pcThreadName, uintptr_t* pptrHandle)
 {
 	return MIE_SUCCESS;
 }

@@ -91,68 +91,7 @@
                     <div dojoType="ravenna.widget.Statistics" store="ravenna.Device.store"></div>
                 </div>
                 -->
-                <div dojotype="dijit.layout.ContentPane" title="Debug" selected="true">					
-					<h1>Build Number</h1>
-						<div id="rv-buildnr"></div>
-						
-                    <h1>Commands</h1>
-					<button data-dojo-type="dijit.form.Button" type="button">
-                        Reboot
-                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">							
-                            require(["dojo/dom"], function(dom){
-								ravenna.Device.reboot();                              
-                            });
-                        </script>
-                    </button>
-					<br/>
-                    <button data-dojo-type="dijit.form.Button" type="button">
-                        Reboot to Factory
-                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
-                            require(["dojo/dom"], function(dom){
-                            ravenna.Device.reset_to_factory();
-                            });
-                        </script>
-                    </button>
-                    <br />
-					<button data-dojo-type="dijit.form.Button" type="button">
-                        Save
-                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">							
-                            require(["dojo/dom"], function(dom){
-								ravenna.Device.save();
-                            });
-                        </script>
-                    </button>
-					<br/>
-					
-					<h1>Debug</h1>
-                    <button data-dojo-type="dijit.form.Button" type="button">
-                        Get Report
-                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
-                            require(["dojo/dom"], function(dom){
-                                window.open('/commands/get_report', 'Download');
-                            });
-                        </script>
-                    </button>
-					<br/>
-					<button data-dojo-type="dijit.form.Button" type="button">
-                        Get Device Status
-                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
-                            require(["dojo/dom"], function(dom){
-                                window.open('/commands/get_device_status', 'Download');
-                            });
-                        </script>
-                    </button>
-                    <button data-dojo-type="dijit.form.Button" type="button">
-                        Get Device Engine Status
-                        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
-                            require(["dojo/dom"], function(dom){
-                            window.open('/commands/get_device_engine_status', 'Download');
-                            });
-                        </script>
-                    </button>
-					<br/>									
-                </div>
-
+               
 <!--
                 <div dojoType="dijit.layout.ContentPane" title="Network">
                     <h1>Device Name</h1>

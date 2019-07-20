@@ -34,7 +34,7 @@
 
 #include <sound/asound.h>
 
-#if	defined(__cplusplus)
+#if defined(__cplusplus)
 extern "C"
 {
 #endif // defined(__cplusplus)
@@ -54,8 +54,7 @@ struct ravenna_mgr_ops
     //uint32_t (*get_capture_buffer_offset)(void *mr_alsa_audio_chip);/// returns current offset in samples (channel independent) for Ravenna Ring Buffer
     uint32_t (*get_playback_buffer_offset)(void *mr_alsa_audio_chip);/// returns current offset (channel independent) in samples for Ravenna Ring Buffer
     int (*notify_master_volume_change)(void* mr_alsa_audio_chip, int direction, int32_t value); /// direction: 0 for playback, 1 for capture. value: from -99 to 0
-	int (*notify_master_switch_change)(void* mr_alsa_audio_chip, int direction, int32_t value); /// direction: 0 for playback, 1 for capture. value: 0 for mute, 1 for enable
-
+    int (*notify_master_switch_change)(void* mr_alsa_audio_chip, int direction, int32_t value); /// direction: 0 for playback, 1 for capture. value: 0 for mute, 1 for enable
 };
 
 /// Put functions to be called by ALSA driver (C ALSA to CPP Ravenna wrapper/owner object)
@@ -67,9 +66,10 @@ struct alsa_ops
     int (*get_min_interrupts_frame_size)(void* ravenna_peer, uint32_t *framesize); /// returns min Ravenna Frame Size in samples (channel independent)
     int (*get_max_interrupts_frame_size)(void* ravenna_peer, uint32_t *framesize); /// returns max Ravenna Frame Size (hardware dependent) in samples (channel independent)
     int (*get_interrupts_frame_size)(void* ravenna_peer, uint32_t *framesize); /// returns current Ravenna Frame Size in samples (channel independent)
-    int (*set_sample_rate)(void* ravenna_peer, uint32_t rate); 	/// rate: use PCM rates values or raw DSD sample rates values. stop_interrupts() should be called prior sample rate changes.
-																///  this function is not atomic and caller must be schedulable
+    int (*set_sample_rate)(void* ravenna_peer, uint32_t rate);  /// rate: use PCM rates values or raw DSD sample rates values. stop_interrupts() should be called prior sample rate changes.
+                                                                ///  this function is not atomic and caller must be schedulable
     int (*get_sample_rate)(void* ravenna_peer, uint32_t *rate); /// returns current Ravenna sample rate (actual PCM rate or actual DSD rate)
+    int (*get_jitter_buffer_sample_bytelength)(void* ravenna_peer, char *byte_len); /// returns current Ravenna sample rate (actual PCM rate or actual DSD rate)
     int (*get_nb_inputs)(void* ravenna_peer, uint32_t *nb_channels);
     int (*get_nb_outputs)(void* ravenna_peer, uint32_t *nb_channels);
     int (*get_playout_delay)(void* ravenna_peer, snd_pcm_sframes_t *delay_in_sample);
@@ -78,20 +78,17 @@ struct alsa_ops
     int (*stop_interrupts)(void* ravenna_peer); /// stops IO
 
     int (*notify_master_volume_change)(void* ravenna_peer, int direction, int32_t value); /// direction: 0 for playback, 1 for capture. value: from -99 to 0
-	int (*notify_master_switch_change)(void* ravenna_peer, int direction, int32_t value); /// direction: 0 for playback, 1 for capture. value: 0 for mute, 1 for enable
-	int (*get_master_volume_value)(void* ravenna_peer, int direction, int32_t* value); /// direction: 0 for playback, 1 for capture. value: from -99 to 0
-	int (*get_master_switch_value)(void* ravenna_peer, int direction, int32_t* value); /// direction: 0 for playback, 1 for capture. value: 0 for mute, 1
-
+    int (*notify_master_switch_change)(void* ravenna_peer, int direction, int32_t value); /// direction: 0 for playback, 1 for capture. value: 0 for mute, 1 for enable
+    int (*get_master_volume_value)(void* ravenna_peer, int direction, int32_t* value); /// direction: 0 for playback, 1 for capture. value: from -99 to 0
+    int (*get_master_switch_value)(void* ravenna_peer, int direction, int32_t* value); /// direction: 0 for playback, 1 for capture. value: 0 for mute, 1
 };
 
 /// Put ALSA driver functions which needs to be used by CPP code here:
 extern int mr_alsa_audio_card_init(void* ravennaPeer, struct alsa_ops *callbacks);
 extern void mr_alsa_audio_card_exit(void);
 
-
-
 #if	defined(__cplusplus)
 }
-#endif	// defined(__cplusplus)
+#endif // defined(__cplusplus)
 
-#endif	//	__audio_driver_h__
+#endif // __audio_driver_h__

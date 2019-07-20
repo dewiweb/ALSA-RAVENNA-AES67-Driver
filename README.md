@@ -131,6 +131,7 @@ Next to the Butler binary, you will find the merging_ravenna_daemon.conf file pr
 * config_pathname : Path where the config file will be saved e.g streamer and receiver
 * max_tic_frame_size : in case of a high value of tic_frame_size_at_1fs, this have to be set to 8192
 * source_name_prefix : the name of the source that will be automatically used. Useful in the high-end world
+* default_sample_rate : Samplerate (44100, 48000, 96000, ...) set at daemon launch. Useful to start at the nominal system samplerate and thus prevents to change it through the ALSA API
 
 ## Audio networking ##
 A general presentation on Audio networking can be found on : [here](https://www.merging.com/highlights/audio-networking#audio-networking)
